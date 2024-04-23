@@ -1,20 +1,34 @@
-const http = require('http')
-const fs = require('fs')
+const express = require('express')
 
-let server = http.createServer((req, res) => {
-    res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'})
+const app = express()
 
-    if(req.url == '/')
-        fs.createReadStream('./templates/index.html').pipe(res)
-    else if(req.url == '/about')
-        fs.createReadStream('./templates/about.html').pipe(res)
+app.set('view engine', 'ejs')
+app.use(express.urlencoded({extendet: false}))
+app.use(express.static('public'))
+
+app.get('/', (req, res) => {
+    res.render('index')    
+})
+
+app.get('/about', (req, res) => {
+    res.render('about')    
+})
+
+app.get('/user/:username', (req, res) => {
+    let data = {username: req.params.username, hobbies: [ 'Football', 'Skate', 'Basketball' ]}
+    res.render('user', data)   
+})
+
+app.post('/check-user', (req, res) => {
+    let username = req.body.username
+    if(username == "")
+        return res.redirect('/')
     else
-        fs.createReadStream('./templates/error.html').pipe(res)
+    return res.redirect('/user/' + username)
 })
 
 const PORT = 3000
-const HOST = 'localhost'
 
-server.listen(PORT, HOST, () => {
-    console.log(`Сервер запущен: http://${HOST}:${PORT}`)
+app.listen(PORT, () => {
+    console.log(`Server started: http://localhost:${PORT}`)
 })
