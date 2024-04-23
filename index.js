@@ -1,9 +1,20 @@
-const os = require('os')
-let res= os.platform()
-console.log(res)
+const http = require('http')
+const fs = require('fs')
 
-const my_math = require('./my_math.js')
-let res1 = my_math.add(4, 5)
-let res2 = my_math.minus(7, 5)
+let server = http.createServer((req, res) => {
+    res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'})
 
-console.log(`Res1: ${res1}, Res2: ${res2}`)
+    if(req.url == '/')
+        fs.createReadStream('./templates/index.html').pipe(res)
+    else if(req.url == '/about')
+        fs.createReadStream('./templates/about.html').pipe(res)
+    else
+        fs.createReadStream('./templates/error.html').pipe(res)
+})
+
+const PORT = 3000
+const HOST = 'localhost'
+
+server.listen(PORT, HOST, () => {
+    console.log(`Сервер запущен: http://${HOST}:${PORT}`)
+})
